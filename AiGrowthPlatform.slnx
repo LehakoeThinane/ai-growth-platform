@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Api/">
+    <Project Path="src/Api/AiGrowthPlatform.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Business/" />
+  <Folder Name="/src/Modules/Business/Application/">
+    <Project Path="src/Modules/Business/Application/AiGrowthPlatform.Business.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Business/Domain/">
+    <Project Path="src/Modules/Business/Domain/AiGrowthPlatform.Business.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Business/Infrastructure/">
+    <Project Path="src/Modules/Business/Infrastructure/AiGrowthPlatform.Business.Infrastructure.csproj" />
+  </Folder>
+</Solution>
