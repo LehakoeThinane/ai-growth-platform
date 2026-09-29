@@ -5,6 +5,15 @@
 
 # dotenv files
 .env
+.env.*
+!.env.example
+**/App_Data/
+
+# Local secrets and machine-specific settings (use `dotnet user-secrets` instead)
+appsettings.*.local.json
+appsettings.Local.json
+secrets.json
+*.secrets.json
 
 # User-specific files
 *.rsuser
