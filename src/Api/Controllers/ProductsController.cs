@@ -28,6 +28,17 @@ public sealed class ProductsController(IMediator mediator, IOrganizationReposito
         if (await organizations.GetByIdAsync(organizationId, ct) is null) return NotFound();
         return Ok((await products.ListAsync(organizationId, skip, take, ct)).Select(ProductResponse.From));
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ProductResponse>> Update(Guid organizationId, Guid id, CreateProductRequest request, CancellationToken ct) =>
+        Ok(await mediator.Send(new UpdateProductCommand(organizationId, id, request.Name, request.Description, request.Price), ct));
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid organizationId, Guid id, CancellationToken ct)
+    {
+        await mediator.Send(new DeleteProductCommand(organizationId, id), ct);
+        return NoContent();
+    }
 }
 
 public sealed record CreateProductRequest(

@@ -1,3 +1,4 @@
+using AiGrowthPlatform.Business.Application.Organizations;
 using AiGrowthPlatform.Business.Application.Organizations.Commands.CreateOrganization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -40,4 +41,19 @@ public class OrganizationsController : ControllerBase
             $"/api/organizations/{result.Id}",
             result);
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, UpdateOrganizationRequest request, CancellationToken cancellationToken) =>
+        Ok(await _mediator.Send(new UpdateOrganizationCommand(id, request.Name, request.WebsiteUrl), cancellationToken));
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new DeleteOrganizationCommand(id), cancellationToken);
+        return NoContent();
+    }
 }
+
+public sealed record UpdateOrganizationRequest(
+    [Required, StringLength(200)] string Name,
+    [StringLength(500)] string? WebsiteUrl);

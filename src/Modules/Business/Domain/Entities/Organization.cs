@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace AiGrowthPlatform.Business.Domain.Entities;
 
 public class Organization
@@ -18,6 +20,14 @@ public class Organization
 
     public Organization(string name, string? websiteUrl = null)
     {
+        Id = Guid.NewGuid();
+        CreatedAt = DateTime.UtcNow;
+        Update(name, websiteUrl);
+    }
+
+    [MemberNotNull(nameof(Name))]
+    public void Update(string name, string? websiteUrl)
+    {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new BusinessValidationException("Organization name is required.");
@@ -30,9 +40,7 @@ public class Organization
             !Uri.TryCreate(websiteUrl, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https")))
             throw new BusinessValidationException("Website URL must be an absolute HTTP or HTTPS URL of at most 500 characters.");
 
-        Id = Guid.NewGuid();
         Name = name.Trim();
         WebsiteUrl = websiteUrl;
-        CreatedAt = DateTime.UtcNow;
     }
 }

@@ -46,8 +46,12 @@ This creates a sample organization and product in PostgreSQL, runs the growth wo
 | POST | `/api/organizations/{id}/products` | Create using `name`, optional `description`, and optional `price`. |
 | GET | `/api/organizations/{id}/products?skip=0&take=50` | List that organization's products. |
 | GET | `/api/organizations/{id}/products/{productId}` | Read a product scoped to its organization. |
+| PUT | `/api/organizations/{id}` | Replace `name` and `websiteUrl`. |
+| DELETE | `/api/organizations/{id}` | Delete an organization that has no products (409 otherwise). |
+| PUT | `/api/organizations/{id}/products/{productId}` | Replace `name`, `description`, and `price`. Omitted optional fields are cleared. |
+| DELETE | `/api/organizations/{id}/products/{productId}` | Delete a product. |
 
-Lists support `skip >= 0` and `take` from 1 to 100. Names are required and limited to 200 characters; descriptions to 2000. Website URLs must be absolute HTTP/HTTPS URLs. Prices must be non-negative, have at most two decimal places, and fit within 16 whole-number digits. Omit price when unknown. There is no currency field yet; keep amounts in a consistent currency for your catalogue. Product update and delete endpoints are not included.
+Lists support `skip >= 0` and `take` from 1 to 100. Names are required and limited to 200 characters; descriptions to 2000. Website URLs must be absolute HTTP/HTTPS URLs. Prices must be non-negative, have at most two decimal places, and fit within 16 whole-number digits. Omit price when unknown. There is no currency field yet; keep amounts in a consistent currency for your catalogue. Updates use the same validation as creation and are last-write-wins. Growth plans already saved by earlier runs are not changed when products are edited or deleted.
 
 When `Agents:AccessKey` is configured, include `X-Agent-Key` on both business and agent requests. Without it, `/api` routes accept loopback requests only in Development. The shared key grants operator access to all records; per-user organization authorization remains future work.
 

@@ -81,6 +81,46 @@ public sealed class CatalogApiTests(PostgresFixture database) : IClassFixture<Po
     }
 
     [PostgresFact]
+    public async Task Organizations_and_products_can_be_edited_and_deleted()
+    {
+        var ct = TestContext.Current.CancellationToken;
+        await using var app = new ApiFactory(database.ConnectionString);
+        using var client = app.CreateAuthorizedClient();
+        var created = await client.PostAsJsonAsync("/api/organizations", new { name = "Editable" }, ct);
+        var id = (await created.Content.ReadFromJsonAsync<JsonElement>(ct)).GetProperty("id").GetGuid();
+        var orgRoute = $"/api/organizations/{id}";
+
+        var renamed = await client.PutAsJsonAsync(orgRoute, new { name = "Renamed", websiteUrl = "https://example.org" }, ct);
+        Assert.Equal(HttpStatusCode.OK, renamed.StatusCode);
+        var organization = await client.GetFromJsonAsync<JsonElement>(orgRoute, ct);
+        Assert.Equal("Renamed", organization.GetProperty("name").GetString());
+        Assert.Equal("https://example.org", organization.GetProperty("websiteUrl").GetString());
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(orgRoute, new { name = " " }, ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync($"/api/organizations/{Guid.NewGuid()}", new { name = "Missing" }, ct)).StatusCode);
+
+        var productResponse = await client.PostAsJsonAsync($"{orgRoute}/products", new { name = "Original", description = "Before", price = 10m }, ct);
+        var productId = (await productResponse.Content.ReadFromJsonAsync<JsonElement>(ct)).GetProperty("id").GetGuid();
+        var productRoute = $"{orgRoute}/products/{productId}";
+        var updated = await client.PutAsJsonAsync(productRoute, new { name = "Updated", price = 12.5m }, ct);
+        Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
+        var product = await client.GetFromJsonAsync<JsonElement>(productRoute, ct);
+        Assert.Equal("Updated", product.GetProperty("name").GetString());
+        Assert.Equal(JsonValueKind.Null, product.GetProperty("description").ValueKind);
+        Assert.Equal(12.5m, product.GetProperty("price").GetDecimal());
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(productRoute, new { name = "Bad", price = 1.234m }, ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.PutAsJsonAsync($"/api/organizations/{Guid.NewGuid()}/products/{productId}", new { name = "Other org" }, ct)).StatusCode);
+
+        var blocked = await client.DeleteAsync(orgRoute, ct);
+        Assert.Equal(HttpStatusCode.Conflict, blocked.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/organizations/{Guid.NewGuid()}/products/{productId}", ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync(productRoute, ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync(productRoute, ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync(productRoute, ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync(orgRoute, ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync(orgRoute, ct)).StatusCode);
+    }
+
+    [PostgresFact]
     public async Task Agent_and_business_endpoints_use_the_same_access_key()
     {
         await using var app = new ApiFactory(database.ConnectionString);

@@ -15,8 +15,10 @@ public sealed class BusinessExceptionHandler : IExceptionHandler
         {
             BusinessValidationException => new ProblemDetails { Status = 400, Title = "Invalid business data", Detail = exception.Message },
             BusinessNotFoundException => new ProblemDetails { Status = 404, Title = "Record not found", Detail = exception.Message },
+            BusinessConflictException => new ProblemDetails { Status = 409, Title = "Record in use", Detail = exception.Message },
+            DbUpdateConcurrencyException => new ProblemDetails { Status = 409, Title = "Record changed", Detail = "The record was changed or deleted by another request. Reload it before retrying." },
             DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.ForeignKeyViolation } } =>
-                new ProblemDetails { Status = 409, Title = "Related organization changed", Detail = "Reload the organization before retrying." },
+                new ProblemDetails { Status = 409, Title = "Related records changed", Detail = "Reload the organization and its products before retrying." },
             _ => null
         };
         if (problem is null) return false;

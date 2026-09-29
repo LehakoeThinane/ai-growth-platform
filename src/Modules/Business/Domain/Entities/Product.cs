@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace AiGrowthPlatform.Business.Domain.Entities;
 
 public class Product
@@ -31,6 +33,15 @@ public class Product
             throw new BusinessValidationException("Organization ID is required.");
         }
 
+        Id = Guid.NewGuid();
+        OrganizationId = organizationId;
+        CreatedAt = DateTime.UtcNow;
+        Update(name, description, price);
+    }
+
+    [MemberNotNull(nameof(Name))]
+    public void Update(string name, string? description, decimal? price)
+    {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new BusinessValidationException("Product name is required.");
@@ -44,11 +55,8 @@ public class Product
         if (price is { } amount && (amount < 0 || amount > 9999999999999999.99m || decimal.Round(amount, 2) != amount))
             throw new BusinessValidationException("Price must be non-negative, have at most two decimal places, and fit within 16 whole-number digits.");
 
-        Id = Guid.NewGuid();
-        OrganizationId = organizationId;
         Name = name.Trim();
         Description = description?.Trim();
         Price = price;
-        CreatedAt = DateTime.UtcNow;
     }
 }
