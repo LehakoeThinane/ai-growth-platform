@@ -38,4 +38,16 @@ public sealed class OrganizationRepository : IOrganizationRepository
     public async Task<IReadOnlyList<Organization>> ListAsync(int skip, int take, CancellationToken cancellationToken) =>
         await _dbContext.Organizations.AsNoTracking().OrderBy(x => x.Name).ThenBy(x => x.Id)
             .Skip(skip).Take(take).ToListAsync(cancellationToken);
+
+    public async Task UpdateAsync(Organization organization, CancellationToken cancellationToken)
+    {
+        _dbContext.Organizations.Update(organization);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(Organization organization, CancellationToken cancellationToken)
+    {
+        _dbContext.Organizations.Remove(organization);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

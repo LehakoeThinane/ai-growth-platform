@@ -47,6 +47,25 @@ public sealed class BusinessValidationTests
         Assert.Null(new Product(organization.Id, "Unpriced").Price);
     }
 
+    [Fact]
+    public void Updates_apply_the_same_rules_and_keep_identity()
+    {
+        var organization = new Organization("Business");
+        var product = new Product(organization.Id, "Product", "Old", 5);
+        var (id, created) = (product.Id, product.CreatedAt);
+        organization.Update(" Renamed ", "https://example.com");
+        product.Update(" New name ", null, null);
+        Assert.Equal("Renamed", organization.Name);
+        Assert.Equal("https://example.com", organization.WebsiteUrl);
+        Assert.Equal(("New name", (string?)null, (decimal?)null), (product.Name, product.Description, product.Price));
+        Assert.Equal((id, created, organization.Id), (product.Id, product.CreatedAt, product.OrganizationId));
+        Assert.Throws<BusinessValidationException>(() => organization.Update(" ", null));
+        Assert.Throws<BusinessValidationException>(() => organization.Update("Business", "example.com"));
+        Assert.Throws<BusinessValidationException>(() => product.Update("Product", null, -1));
+        Assert.Throws<BusinessValidationException>(() => product.Update(new string('x', 201), null, null));
+        Assert.Equal("New name", product.Name);
+    }
+
     [Theory]
     [InlineData("Demo", "Auto", "Demo")]
     [InlineData("OpenAI", "Auto", "Database")]
