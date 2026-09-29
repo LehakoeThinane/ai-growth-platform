@@ -5,7 +5,7 @@ A .NET 10 backend with two agent workflows: drafting business growth plans and r
 
 ## Current capabilities
 
-- **Business catalogue:** create/list/read organizations and products, with input validation, pagination, and a database-enforced organization link. See [real data and model setup](docs/real-data-and-model-setup.md).
+- **Business catalogue:** create/list/read/update/delete organizations and products, with input validation, pagination, and a database-enforced organization link. See [real data and model setup](docs/real-data-and-model-setup.md).
 - **Growth:** read an organization and up to 100 products, consult built-in guidance, and optionally save a draft growth plan.
 - **Support:** read an internal incident, consult an approved procedure, optionally mark a verified recovery resolved or escalate it, then re-read to verify the update.
 - **Shared runner:** one tool decision per step, a configurable step limit and deadline, read-only runs by default, terminal failure states, and run/event retrieval.
@@ -113,7 +113,7 @@ See [the agent design](docs/agent-system-design.md) for component boundaries, co
 dotnet test --solution AiGrowthPlatform.slnx --configuration Release
 ```
 
-Tests cover both workflows, read-only behavior, policy enforcement, missing evidence, invalid/unknown tools, step limits, cancellation, persistence, memory isolation, stale ticket updates, crash recovery, and the model HTTP contract without paid API calls. GitHub Actions builds and runs this suite on pushes and PRs to `Dev` and `Main`.
+Tests cover both workflows, read-only behavior, policy enforcement, missing evidence, invalid/unknown tools, step limits, cancellation, persistence, memory isolation, stale ticket updates, crash recovery, and the model HTTP contract without paid API calls. GitHub Actions builds and runs this suite on pushes to `Dev`, `Main`, and `feature/**` branches, and on PRs to `Dev` and `Main`.
 
 With the demo server running, `./scripts/Test-AgentApi.ps1` checks the HTTP endpoints end to end. It saves sample plans and resolves/escalates the two sample tickets.
 

@@ -13,4 +13,8 @@ public interface IOrganizationRepository
     Task<Organization?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default);
+
+    Task UpdateAsync(Organization organization, CancellationToken cancellationToken);
+
+    Task DeleteAsync(Organization organization, CancellationToken cancellationToken);
 }
