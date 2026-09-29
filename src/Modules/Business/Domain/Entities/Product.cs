@@ -28,24 +28,21 @@ public class Product
     {
         if (organizationId == Guid.Empty)
         {
-            throw new ArgumentException(
-                "Organization ID is required.",
-                nameof(organizationId));
+            throw new BusinessValidationException("Organization ID is required.");
         }
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException(
-                "Product name is required.",
-                nameof(name));
+            throw new BusinessValidationException("Product name is required.");
         }
 
-        if (price < 0)
+        if (name.Trim().Length > 200 || description?.Trim().Length > 2000)
         {
-            throw new ArgumentException(
-                "Product price cannot be negative.",
-                nameof(price));
+            throw new BusinessValidationException("Product names must be at most 200 characters and descriptions at most 2000.");
         }
+
+        if (price is { } amount && (amount < 0 || amount > 9999999999999999.99m || decimal.Round(amount, 2) != amount))
+            throw new BusinessValidationException("Price must be non-negative, have at most two decimal places, and fit within 16 whole-number digits.");
 
         Id = Guid.NewGuid();
         OrganizationId = organizationId;

@@ -4,6 +4,13 @@
     <Project Path="src/Api/AiGrowthPlatform.Api.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Agents/">
+    <Project Path="src/Modules/Agents/AiGrowthPlatform.Agents.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AiGrowthPlatform.Api.Tests/AiGrowthPlatform.Api.Tests.csproj" />
+    <Project Path="tests/AiGrowthPlatform.Agents.Tests/AiGrowthPlatform.Agents.Tests.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Business/" />
   <Folder Name="/src/Modules/Business/Application/">
     <Project Path="src/Modules/Business/Application/AiGrowthPlatform.Business.Application.csproj" />
